@@ -15,11 +15,12 @@ def get_annotation_info(path):
     return pd.read_csv(path)
 
 
-def create_binary_mask(bbox_coords, im_ref_width, im_ref_height):
+def create_binary_mask(list_bbox_coords, im_ref_width, im_ref_height):
     """Creates a mask for the bounding box of same shape as image."""
     binary_mask = np.zeros((im_ref_height, im_ref_width), dtype=np.float16)
-    bbox_coords = bbox_coords.astype(np.int)
-    binary_mask[bbox_coords[1]:bbox_coords[3], bbox_coords[0]:bbox_coords[2]] = 1.
+    for bbox_coords in list_bbox_coords:
+        bbox_coords = bbox_coords.astype(np.int)
+        binary_mask[bbox_coords[1]:bbox_coords[3], bbox_coords[0]:bbox_coords[2]] = 1.
     return binary_mask
 
 
