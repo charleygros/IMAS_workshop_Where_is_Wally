@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def get_fname_list(root, extension):
     """Returns a list of filenames under root directory with a given extension."""
     return [os.path.join(directory_path, f) for directory_path, directory_name,
