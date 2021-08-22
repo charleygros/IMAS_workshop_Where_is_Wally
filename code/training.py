@@ -17,8 +17,6 @@ def train_model(model, optimizer, dataset_training, dataset_validation=None, n_e
             pred = model(x)
             pred = pred[:, 1:, :, :]
             loss = loss_fct(pred, y)
-            print(loss)
-            print(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
