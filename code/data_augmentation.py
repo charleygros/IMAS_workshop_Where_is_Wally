@@ -30,11 +30,9 @@ class RandomHorizontalFlip(object):
         self.p = p
 
     def __call__(self, img, bbox):
-            img_center = np.array(img.shape[:2])[::-1]/2
-            img_center = np.hstack((img_center, img_center))
             if np.random.random() < self.p:
-                img = img[:, ::-1, :]
-                bbox = bbox[:, ::-1]
+                img = np.fliplr(img)
+                bbox = np.fliplr(bbox)
 
             return img, bbox
 
