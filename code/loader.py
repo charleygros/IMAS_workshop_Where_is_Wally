@@ -72,9 +72,9 @@ class WaldoLoader(Dataset):
         assert(np.array_equal(Y, Y.astype(bool)))
 
         Y = np.expand_dims(Y, axis=0)
-        X = torch.from_numpy(X).float()
+        X = torch.from_numpy(X.copy()).float()
         #Y = np.array(waldo_utils.find_bounding_box_coords(Y), dtype=np.float32)
-        Y = torch.from_numpy(Y)
+        Y = torch.from_numpy(Y.copy())
 
         return X, Y
 
