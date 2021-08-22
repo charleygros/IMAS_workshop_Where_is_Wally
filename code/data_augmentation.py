@@ -26,15 +26,11 @@ class Sequence(object):
 class RandomHorizontalFlip(object):
     """Randomly horizontally flips the Image with the probability p."""
 
-    def __init__(self, p=0.5):
-        self.p = p
-
     def __call__(self, img, bbox):
-        if np.random.random() < self.p:
-            img = np.fliplr(img)
-            bbox = np.fliplr(bbox)
+        img_ = np.fliplr(img)
+        bbox_ = np.fliplr(bbox)
 
-        return img, bbox
+        return img_, bbox_
 
 
 class RandomTranslate(object):
@@ -87,7 +83,6 @@ class RandomTranslate(object):
         canvas_bbox[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3]] = mask
         bbox = canvas_bbox
         bbox_area_after = np.sum(bbox)
-        print(bbox_area_before, bbox_area_after)
 
         if bbox_area_after < 0.25 * bbox_area_before:
             bbox = np.zeros(bbox.shape)
