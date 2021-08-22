@@ -4,7 +4,7 @@ import torch.nn as nn
 def train_model(model, optimizer, dataset_training, dataset_validation=None, n_epoch=10):
     """Trains model."""
     idx = 0
-    best_val_loss = -1
+    best_val_loss = 0
     loss_fct = DiceLoss().cuda()
     for i in range(n_epoch):
         model.train()
@@ -26,12 +26,12 @@ def train_model(model, optimizer, dataset_training, dataset_validation=None, n_e
         train_loss = sum_loss / total
         if dataset_validation is not None:
             val_loss = run_validation(model, dataset_validation, loss_fct)
-            print("Epoch#{} -- Train loss: {} -- Validation loss: {}".format(i, round(train_loss, 3), round(val_loss, 3)))
+            print("Epoch#{} -- Train loss: {} -- Validation loss: {}".format(i+1, round(train_loss, 3), round(val_loss, 3)))
             if val_loss < best_val_loss:
                 best_model = model
                 best_val_loss = val_loss
         else:
-            print("Epoch#{} -- Train loss: {}".format(i, round(train_loss, 3)))
+            print("Epoch#{} -- Train loss: {}".format(i+1, round(train_loss, 3)))
             best_model = model
     return best_model
 
