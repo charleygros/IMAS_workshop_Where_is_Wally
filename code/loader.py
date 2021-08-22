@@ -4,7 +4,7 @@ from PIL import Image
 import torch
 from torch.utils.data import Dataset
 
-import utils as utils
+import utils as waldo_utils
 
 
 class WaldoLoader(Dataset):
@@ -41,7 +41,7 @@ class WaldoLoader(Dataset):
             self.list_patch_positive_img = []
             self.list_patch_positive_gt = []
             for i, gt in enumerate(self.stack_gt):
-                coords_bbox = utils.find_bounding_box_coords(gt)
+                coords_bbox = waldo_utils.find_bounding_box_coords(gt)
                 self.list_patch_positive_img.append(extract_positive_patch(self.stack_img[i], coords_bbox, size_patch))
                 self.list_patch_positive_gt.append(extract_positive_patch(gt, coords_bbox, size_patch))
         else:
@@ -63,18 +63,17 @@ class WaldoLoader(Dataset):
         if self.sequence_transforms is not None:
             X, Y = self.sequence_transforms(X, Y)
 
-        X = utils.StandardizeInstance()(X)
+        X = waldo_utils.StandardizeInstance()(X)
 
         X = np.rollaxis(X, 2)
 
-        print(X.shape, Y.shape, np.unique(Y), idx_)
         assert (X.shape[1:] == Y.shape)
         assert (Y.shape == (self.size_patch, self.size_patch))
         assert(np.array_equal(Y, Y.astype(bool)))
 
         #Y = np.expand_dims(Y, axis=0)
         X = torch.from_numpy(X).float()
-        Y = np.array(utils.find_bounding_box_coords(Y), dtype=np.float32)
+        Y = np.array(waldo_utils.find_bounding_box_coords(Y), dtype=np.float32)
         Y = torch.from_numpy(Y)
 
         return X, Y
@@ -110,7 +109,7 @@ def patchify(im, patch_size):
     is_2D = len(im.shape) == 2
 
     # If patch_size is not multiple of the image size, image is mirrored.
-    if ((im.shape[0] % patch_size[0]) != 0) or ((im.shape[1] % patch_size[1]) != 0):
+    if ((im.shape[0] % patch_size) != 0) or ((im.shape[1] % patch_size) != 0):
         im = mirror(im, patch_size)
 
     for i in range(0, width, patch_size):
@@ -119,15 +118,13 @@ def patchify(im, patch_size):
                 patch = im[i:i+patch_size, j:j+patch_size]
             else:
                 patch = im[i:i+patch_size, j:j+patch_size, :]
-            if patch.shape == (patch_size, patch_size):
+            if patch.shape[:2] == (patch_size, patch_size):
                 patches.append(patch)
     return patches
 
 
 def mirror(im, length):
-    """
-    Mirror an image on the right on length pixels
-    """
+    """Mirrors an image on the right on length pixels."""
     width, height = im.shape[0], im.shape[1]
     is_2D = len(im.shape) == 2
 
@@ -153,7 +150,6 @@ def extract_all_patches(images, labels, patch_size):
     # Get patches
     image_patches = [patch for im in images for patch in patchify(im, patch_size)]
     label_patches = [patch for label in labels for patch in patchify(label, patch_size)]
-
     assert(len(image_patches) == len(label_patches))
 
     return image_patches, label_patches
