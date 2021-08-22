@@ -47,6 +47,7 @@ def run_validation(model, dataset_validation, loss_fct):
         x = x.cuda().float()
         y = y.cuda().float()
         pred = model(x)
+        pred = pred[:, 1:, :, :]
         loss = loss_fct(pred, y)
         sum_loss += loss.item()
         total += batch
