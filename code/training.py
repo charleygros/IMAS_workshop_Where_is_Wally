@@ -17,6 +17,8 @@ def train_model(model, optimizer, dataset_training, dataset_validation=None, n_e
             pred = model(x)
             pred = pred[:, 1:, :, :]
             loss = loss_fct(pred, y)
+            print(loss)
+            print(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -27,7 +29,7 @@ def train_model(model, optimizer, dataset_training, dataset_validation=None, n_e
         if dataset_validation is not None:
             val_loss = run_validation(model, dataset_validation, loss_fct)
             print("Epoch#{} -- Train loss: {} -- Validation loss: {}".format(i, round(train_loss, 3), round(val_loss, 3)))
-            if val_loss > best_val_loss:
+            if val_loss < best_val_loss:
                 best_model = model
                 best_val_loss = val_loss
         else:
