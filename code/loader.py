@@ -64,6 +64,7 @@ class WaldoLoader(Dataset):
             X, Y = self.sequence_transforms(X, Y)
 
         X = waldo_utils.StandardizeInstance()(X)
+        print(X.mean(), Y.std())
 
         X = np.rollaxis(X, 2)
 
@@ -71,9 +72,10 @@ class WaldoLoader(Dataset):
         assert (Y.shape == (self.size_patch, self.size_patch))
         assert(np.array_equal(Y, Y.astype(bool)))
 
-        #Y = np.expand_dims(Y, axis=0)
+        Y = np.expand_dims(Y, axis=0)
+        print(X.shape, Y.shape)
         X = torch.from_numpy(X).float()
-        Y = np.array(waldo_utils.find_bounding_box_coords(Y), dtype=np.float32)
+        #Y = np.array(waldo_utils.find_bounding_box_coords(Y), dtype=np.float32)
         Y = torch.from_numpy(Y)
 
         return X, Y
