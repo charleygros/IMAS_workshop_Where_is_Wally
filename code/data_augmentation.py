@@ -34,7 +34,7 @@ class RandomHorizontalFlip(object):
             img_center = np.hstack((img_center, img_center))
             if np.random.random() < self.p:
                 img = img[:, ::-1, :]
-                bbox = bbox[:, ::-1, :]
+                bbox = bbox[:, ::-1]
 
             return img, bbox
 
@@ -87,8 +87,8 @@ class RandomTranslate(object):
 
         bbox_area_before = np.sum(bbox)
         mask = bbox[max(-corner_y, 0):min(img.shape[0], -corner_y + img_shape[0]),
-               max(-corner_x, 0):min(img.shape[1], -corner_x + img_shape[1]), :]
-        canvas[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3], :] = mask
+               max(-corner_x, 0):min(img.shape[1], -corner_x + img_shape[1])]
+        canvas[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3]] = mask
         bbox = canvas
         bbox_area_after = np.sum(bbox)
 
