@@ -16,6 +16,7 @@ def train_model(model, optimizer, dataset_training, dataset_validation=None, n_e
             y = y.cuda().float()
             pred = model(x)
             pred = pred[:, 1:, :, :]
+            print(y.size(), pred.size())
             loss = loss_fct(pred, y)
             optimizer.zero_grad()
             loss.backward()
