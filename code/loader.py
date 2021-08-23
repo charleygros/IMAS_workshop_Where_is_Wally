@@ -38,7 +38,10 @@ class WaldoLoader(Dataset):
             self.list_patch_positive_gt = []
             for i, gt in enumerate(self.list_gt):
                 coords_bbox = waldo_utils.find_bounding_box_coords(gt)
-                assert (np.array_equal(gt, gt.astype(bool)))
+                #assert (np.array_equal(gt, gt.astype(bool)))
+                if not np.array_equal(gt, gt.astype(bool)):
+                    print(np.unique(gt))
+                    assert (np.array_equal(gt, gt.astype(bool)))
                 self.list_patch_positive_img.append(extract_positive_patch(self.list_img[i], coords_bbox, size_patch))
                 self.list_patch_positive_gt.append(extract_positive_patch(gt, coords_bbox, size_patch))
         else:
