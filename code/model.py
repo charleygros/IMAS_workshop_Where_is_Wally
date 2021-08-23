@@ -102,7 +102,7 @@ class OutConv(nn.Module):
         return self.conv(x)
 
 
-from keras.layers import Activation, Dropout, BatchNormalization, Conv2DTranspose, Deconvolution2D, Input, Conv2D, \
+from keras.layers import Activation, Dropout, BatchNormalization, Conv2DTranspose, Input, Conv2D, \
     concatenate, add, Reshape
 from keras.models import Model
 from keras.regularizers import l2
