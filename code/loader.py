@@ -20,26 +20,26 @@ class WaldoLoader(Dataset):
         self.sequence_transforms = sequence_transforms
 
         print("Loading images ...")
-        self.stack_img = [load_image(path_img, as_grayscale=False) for path_img in self.list_path_img]
-        self.stack_gt = [load_image(path_gt, as_grayscale=True) for path_gt in self.list_path_gt]
+        self.list_img = [load_image(path_img, as_grayscale=False) for path_img in self.list_path_img]
+        self.list_gt = [load_image(path_gt, as_grayscale=True) for path_gt in self.list_path_gt]
         print("Resizing image dimensions so that they are a multiple of the patch size: {} x {} pixels^2 ...".format(self.size_patch, self.size_patch))
-        self.stack_img = np.stack([resize_image(img, size_patch=self.size_patch) for img in self.stack_img])
-        self.stack_gt = np.stack([resize_image(gt, size_patch=self.size_patch) for gt in self.stack_gt])
+        self.list_img = [resize_image(img, size_patch=self.size_patch) for img in self.list_img]
+        self.list_gt = [resize_image(gt, size_patch=self.size_patch) for gt in self.list_gt]
 
         # Binary values for GTs
-        self.stack_gt = self.stack_gt / 255
-        assert(np.array_equal(self.stack_gt, self.stack_gt.astype(bool)))
+        self.list_gt = [gt / 255 for gt in self.list_gt]
 
         # Patch extraction
-        self.list_patch_img, self.list_patch_gt = extract_all_patches(self.stack_img, self.stack_gt, self.size_patch)
+        self.list_patch_img, self.list_patch_gt = extract_all_patches(self.list_img, self.list_gt, self.size_patch)
 
         # Get Positive samples
         if self.balance_positive:
             self.list_patch_positive_img = []
             self.list_patch_positive_gt = []
-            for i, gt in enumerate(self.stack_gt):
+            for i, gt in enumerate(self.list_gt):
                 coords_bbox = waldo_utils.find_bounding_box_coords(gt)
-                self.list_patch_positive_img.append(extract_positive_patch(self.stack_img[i], coords_bbox, size_patch))
+                assert (np.array_equal(gt, gt.astype(bool)))
+                self.list_patch_positive_img.append(extract_positive_patch(self.list_img[i], coords_bbox, size_patch))
                 self.list_patch_positive_gt.append(extract_positive_patch(gt, coords_bbox, size_patch))
         else:
             self.list_patch_positive_img, self.list_patch_positive_gt = None, None
@@ -148,9 +148,6 @@ def resize_image(img, size_patch):
     else:
         new_w = w
     if new_h == h and new_w == w:
-        print("jpo", img.shape)
         return img
     else:
-        img = resize(img, (new_h, new_w))
-        print(img.shape)
-        return img
+        return resize(img, (new_h, new_w))
