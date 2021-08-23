@@ -1,18 +1,4 @@
 import numpy as np
-from skimage.transform import resize
-
-
-def resize_image(img, size_patch):
-    """Resizes image as a multiple of size_patch"""
-    h, w, _ = img.shape
-    if h % size_patch != 0:
-        new_h = (int(h / size_patch) + 1) * size_patch
-    if w % size_patch != 0:
-        new_w = (int(w / size_patch) + 1) * size_patch
-    if new_h == h and new_w == w:
-        return img
-    else:
-        return resize(img, (new_h, new_w))
 
 
 def patchify_test_image(img, size_patch):
