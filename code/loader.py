@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 from skimage.transform import resize
+from skimage.measure import label
 
 import torch
 from torch.utils.data import Dataset
@@ -36,10 +37,14 @@ class WaldoLoader(Dataset):
             self.list_patch_positive_img = []
             self.list_patch_positive_gt = []
             for i, gt in enumerate(self.list_gt):
-                coords_bbox = waldo_utils.find_bounding_box_coords(gt)
                 assert (np.array_equal(gt, gt.astype(bool)))
-                self.list_patch_positive_img.append(extract_positive_patch(self.list_img[i], coords_bbox, size_patch))
-                self.list_patch_positive_gt.append(extract_positive_patch(gt, coords_bbox, size_patch))
+                # In case there are multiple waldo inside an image
+                np_gt_labeled, n_waldo = label(gt, return_num=True)
+                for i_waldo in range(n_waldo):
+                    gt_cur = (np_gt_labeled == i_waldo + 1).astype(int)
+                    coords_bbox = waldo_utils.find_bounding_box_coords(gt_cur)
+                    self.list_patch_positive_img.append(extract_positive_patch(self.list_img[i], coords_bbox, size_patch))
+                    self.list_patch_positive_gt.append(extract_positive_patch(gt_cur, coords_bbox, size_patch))
         else:
             self.list_patch_positive_img, self.list_patch_positive_gt = None, None
 
@@ -86,7 +91,7 @@ def extract_positive_patch(img, coords_bbox, size_patch):
     #i = img[wend - 224:wstart + 224, hend - 224:hstart + 224]
     if i.shape[0] != size_patch or i.shape[1] != size_patch:
         print(i.shape, img.shape, w_middle, h_middle, w_start, w_end, h_start, h_end)
-        i = img[w_start:w_start+size_patch, h_start:h_start+size_patch]
+        i = img[w_end-size_patch:w_end, h_end-size_patch:h_end]
         print("hey", i.shape)
         return i
     else:
