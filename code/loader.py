@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+from skimage.transform import resize
 
 import torch
 from torch.utils.data import Dataset
@@ -10,26 +11,22 @@ import utils as waldo_utils
 class WaldoLoader(Dataset):
     """Waldo Loader."""
 
-    def __init__(self, list_path_img, list_path_gt, size_img, size_patch, balance_positive=False, sequence_transforms=None):
+    def __init__(self, list_path_img, list_path_gt, size_patch, balance_positive=False, sequence_transforms=None):
 
         self.list_path_img = list_path_img
         self.list_path_gt = list_path_gt
-        self.size_img = size_img
         self.size_patch = size_patch
         self.balance_positive = balance_positive
         self.sequence_transforms = sequence_transforms
 
-        print("Resizing all images to same dimensions: {} pixels^2 ...".format(self.size_img))
-        self.stack_img = np.stack([load_image(path_img, as_grayscale=False, size_img=self.size_img)
-                                   for path_img in self.list_path_img])
-        self.stack_gt = np.stack([load_image(path_gt, as_grayscale=True, size_img=self.size_img)
-                                  for path_gt in self.list_path_gt])
-        #self.stack_img = [load_image(path_img, as_grayscale=False, size_img=self.size_img)
-        #                           for path_img in self.list_path_img]
-        #self.stack_gt = [load_image(path_gt, as_grayscale=True, size_img=self.size_img)
-        #                          for path_gt in self.list_path_gt]
+        print("Loading images ...")
+        self.stack_img = [load_image(path_img, as_grayscale=False) for path_img in self.list_path_img]
+        self.stack_gt = [load_image(path_gt, as_grayscale=True) for path_gt in self.list_path_gt]
+        print("Resizing image dimensions so that they are a multiple of the patch size: {} pixels^2 ...".format(self.size_patch))
+        self.stack_img = np.stack([resize_image(img, size_patch=self.size_patch) for img in self.stack_img])
+        self.stack_gt = np.stack([resize_image(gt, size_patch=self.size_patch) for gt in self.stack_gt])
+
         # Binary values for GTs
-        #self.stack_gt = [g / 255 for g in self.stack_gt]
         self.stack_gt = self.stack_gt / 255
         assert(np.array_equal(self.stack_gt, self.stack_gt.astype(bool)))
 
@@ -106,8 +103,8 @@ def patchify(im, patch_size):
     is_2D = len(im.shape) == 2
 
     # If patch_size is not multiple of the image size, image is mirrored.
-    if ((im.shape[0] % patch_size) != 0) or ((im.shape[1] % patch_size) != 0):
-        im = mirror(im, patch_size)
+    #if ((im.shape[0] % patch_size) != 0) or ((im.shape[1] % patch_size) != 0):
+    #    im = mirror(im, patch_size)
 
     for i in range(0, width, patch_size):
         for j in range(0, height, patch_size):
@@ -118,27 +115,6 @@ def patchify(im, patch_size):
             if patch.shape[:2] == (patch_size, patch_size):
                 patches.append(patch)
     return patches
-
-
-def mirror(im, length):
-    """Mirrors an image on the right on length pixels."""
-    width, height = im.shape[0], im.shape[1]
-    is_2D = len(im.shape) == 2
-
-    if is_2D:
-        right_flipped = np.fliplr(im[width - length:, :])
-    else:
-        right_flipped = np.fliplr(im[width - length:, :, :])
-
-    right_mirrored = np.concatenate((im, right_flipped), axis=0)
-
-    if is_2D:
-        bottom_flipped = np.flipud(right_mirrored[:, height - length:])
-    else:
-        bottom_flipped = np.flipud(right_mirrored[:, height - length:, :])
-
-    mirrored = np.concatenate((right_mirrored, bottom_flipped), axis=1)
-    return mirrored
 
 
 def extract_all_patches(images, labels, patch_size):
@@ -152,11 +128,26 @@ def extract_all_patches(images, labels, patch_size):
     return image_patches, label_patches
 
 
-def load_image(path_img, as_grayscale=False, size_img=None):
+def load_image(path_img, as_grayscale=False):
     """Loads image and resizes it if img_size is not None."""
     img = Image.open(path_img)
     if as_grayscale:
         img = img.convert("L")
-    if size_img:
-        img = img.resize(size_img, Image.NEAREST)
     return np.array(img)
+
+
+def resize_image(img, size_patch):
+    """Resizes image as a multiple of size_patch"""
+    h, w, _ = img.shape
+    if h % size_patch != 0:
+        new_h = (int(h / size_patch) + 1) * size_patch
+    else:
+        new_h = h
+    if w % size_patch != 0:
+        new_w = (int(w / size_patch) + 1) * size_patch
+    else:
+        new_w = w
+    if new_h == h and new_w == w:
+        return img
+    else:
+        return resize(img, (new_h, new_w))
