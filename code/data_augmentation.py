@@ -70,10 +70,11 @@ class RandomTranslate(object):
         orig_box_cords = [max(0, corner_y), max(corner_x, 0), min(img_shape[0], corner_y + img.shape[0]),
                           min(img_shape[1], corner_x + img.shape[1])]
 
-        canvas = np.zeros(img_shape).astype(np.uint8)
+        canvas = np.zeros(img_shape)
         print(np.unique(img),"1")
         mask = img[max(-corner_y, 0):min(img.shape[0], -corner_y + img_shape[0]),
                max(-corner_x, 0):min(img.shape[1], -corner_x + img_shape[1]), :]
+        print(np.unique(mask), "15")
         canvas[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3], :] = mask
         img = canvas
         print(np.unique(img), "2")
