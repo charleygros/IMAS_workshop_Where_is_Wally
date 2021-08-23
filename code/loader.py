@@ -37,10 +37,7 @@ class WaldoLoader(Dataset):
             self.list_patch_positive_gt = []
             for i, gt in enumerate(self.list_gt):
                 coords_bbox = waldo_utils.find_bounding_box_coords(gt)
-                #assert (np.array_equal(gt, gt.astype(bool)))
-                if not np.array_equal(gt, gt.astype(bool)):
-                    print(np.unique(gt))
-                    assert (np.array_equal(gt, gt.astype(bool)))
+                assert (np.array_equal(gt, gt.astype(bool)))
                 self.list_patch_positive_img.append(extract_positive_patch(self.list_img[i], coords_bbox, size_patch))
                 self.list_patch_positive_gt.append(extract_positive_patch(gt, coords_bbox, size_patch))
         else:
@@ -81,18 +78,22 @@ class WaldoLoader(Dataset):
 def extract_positive_patch(img, coords_bbox, size_patch):
     """Extracts patches around Bbox of a given patch size."""
     w_start, w_end, h_start, h_end = coords_bbox
+    w_middle = (w_end - w_start) // 2
+    h_middle = (h_end - h_start) // 2
     half_size_patch = size_patch // 2
-    i = img[w_start-half_size_patch:w_start+half_size_patch,
-        h_start-half_size_patch:h_start+half_size_patch]
+    i = img[w_middle-half_size_patch:w_middle+half_size_patch,
+        h_middle-half_size_patch:h_middle+half_size_patch]
     if i.shape[0] != size_patch or i.shape[1] != size_patch:
-        i = img[w_end - size_patch:w_end,
-               h_end - size_patch:h_end]
-        if i.shape[0] != size_patch or i.shape[1] != size_patch:
-            i = img[w_start:w_start+size_patch, h_start:h_start+size_patch]
-        if i.shape[0] < size_patch or i.shape[1] < size_patch:
-            i = np.zeros((size_patch, size_patch))
-            i[w_start:w_start+size_patch, h_start:h_start+size_patch] = img[w_start:w_start+size_patch,
-                                                                        h_start:h_start+size_patch]
+        print(i.shape)
+        exit()
+        #i = img[w_end - size_patch:w_end,
+        #       h_end - size_patch:h_end]
+        #if i.shape[0] != size_patch or i.shape[1] != size_patch:
+        #    i = img[w_start:w_start+size_patch, h_start:h_start+size_patch]
+        #if i.shape[0] < size_patch or i.shape[1] < size_patch:
+        #    i = np.zeros((size_patch, size_patch))
+        #    i[w_start:w_start+size_patch, h_start:h_start+size_patch] = img[w_start:w_start+size_patch,
+        #                                                                h_start:h_start+size_patch]
         return i
     else:
         return i
