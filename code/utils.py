@@ -66,3 +66,12 @@ class StandardizeInstance(object):
     def __call__(self, sample):
         data_out = (sample - sample.mean()) / sample.std()
         return data_out
+
+
+def threshold_mask(mask, threshold=0.5):
+    thr_mask = np.copy(mask)[:]
+    low_values_indices = thr_mask < threshold
+    thr_mask[low_values_indices] = 0
+    low_values_indices = thr_mask >= threshold
+    thr_mask[low_values_indices] = 1
+    return thr_mask.astype(np.int)

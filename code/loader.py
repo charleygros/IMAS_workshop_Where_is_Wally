@@ -25,7 +25,8 @@ class WaldoLoader(Dataset):
         print("Resizing image dimensions so that they are a multiple of the patch size: {} x {} pixels^2 ...".format(self.size_patch, self.size_patch))
         self.list_img = [resize_image(img, size_patch=self.size_patch) for img in self.list_img]
         self.list_gt = [gt / 255 for gt in self.list_gt]
-        self.list_gt = [resize_image(gt.astype(bool), size_patch=self.size_patch) for gt in self.list_gt]
+        self.list_gt = [resize_image(gt, size_patch=self.size_patch) for gt in self.list_gt]
+        self.list_gt = [waldo_utils.threshold_mask(gt, threshold=0.5) for gt in self.list_gt]
 
         # Patch extraction
         self.list_patch_img, self.list_patch_gt = extract_all_patches(self.list_img, self.list_gt, self.size_patch)
