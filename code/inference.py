@@ -47,4 +47,4 @@ def predict_image(path_image, size_patch, path_model = "../dataset/pretrained_mo
     full_img_r, full_pred = waldo_predict(full_img)
     mask = prediction_mask(full_img_r, full_pred)
     #mask.save(os.path.join(args.output_path, 'output_' + str(i) + '.png'))
-    return
+    return mask
