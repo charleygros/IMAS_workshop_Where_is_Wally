@@ -28,3 +28,23 @@ def reconstruct_image_from_patches(img, np_patches, size_patch):
         img_reconstructed.append(np.concatenate(row, axis=1))
     return np.concatenate(img_reconstructed, axis=0)
 
+def predict_image(path_image, size_patch, path_model = "../dataset/pretrained_model.h5"):
+    from model import create_tiramisu
+    import keras
+
+    img_input = Input(shape=(size_patch, size_patch, 3))
+    x = create_tiramisu(2, img_input, nb_layers_per_block=[4, 5, 7, 10, 12, 15], p=0.2, wd=1e-4)
+    model = Model(img_input, x)
+
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=keras.optimizers.RMSprop(1e-3),
+                  metrics=["accuracy"],
+                  sample_weight_mode='temporal')
+
+    model.load_weights(path_model)
+
+    full_img = load_image(path_image, img_sz)
+    full_img_r, full_pred = waldo_predict(full_img)
+    mask = prediction_mask(full_img_r, full_pred)
+    #mask.save(os.path.join(args.output_path, 'output_' + str(i) + '.png'))
+    return
