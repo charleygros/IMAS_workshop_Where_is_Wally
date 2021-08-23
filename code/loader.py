@@ -22,7 +22,7 @@ class WaldoLoader(Dataset):
         print("Loading images ...")
         self.stack_img = [load_image(path_img, as_grayscale=False) for path_img in self.list_path_img]
         self.stack_gt = [load_image(path_gt, as_grayscale=True) for path_gt in self.list_path_gt]
-        print("Resizing image dimensions so that they are a multiple of the patch size: {} pixels^2 ...".format(self.size_patch))
+        print("Resizing image dimensions so that they are a multiple of the patch size: {} x {} pixels^2 ...".format(self.size_patch, self.size_patch))
         self.stack_img = np.stack([resize_image(img, size_patch=self.size_patch) for img in self.stack_img])
         self.stack_gt = np.stack([resize_image(gt, size_patch=self.size_patch) for gt in self.stack_gt])
 
@@ -138,7 +138,7 @@ def load_image(path_img, as_grayscale=False):
 
 def resize_image(img, size_patch):
     """Resizes image as a multiple of size_patch"""
-    h, w, _ = img.shape
+    h, w = img.shape[:2]
     if h % size_patch != 0:
         new_h = (int(h / size_patch) + 1) * size_patch
     else:
@@ -148,6 +148,9 @@ def resize_image(img, size_patch):
     else:
         new_w = w
     if new_h == h and new_w == w:
+        print("jpo", img.shape)
         return img
     else:
-        return resize(img, (new_h, new_w))
+        img = resize(img, (new_h, new_w))
+        print(img.shape)
+        return img
