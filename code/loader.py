@@ -84,16 +84,10 @@ def extract_positive_patch(img, coords_bbox, size_patch):
     i = img[w_middle-half_size_patch:w_middle+half_size_patch,
         h_middle-half_size_patch:h_middle+half_size_patch]
     if i.shape[0] != size_patch or i.shape[1] != size_patch:
-        print(i.shape)
+        print(i.shape, w_middle, h_middle, w_start, w_end, h_start, h_end)
         exit()
-        #i = img[w_end - size_patch:w_end,
-        #       h_end - size_patch:h_end]
-        #if i.shape[0] != size_patch or i.shape[1] != size_patch:
-        #    i = img[w_start:w_start+size_patch, h_start:h_start+size_patch]
-        #if i.shape[0] < size_patch or i.shape[1] < size_patch:
-        #    i = np.zeros((size_patch, size_patch))
-        #    i[w_start:w_start+size_patch, h_start:h_start+size_patch] = img[w_start:w_start+size_patch,
-        #                                                                h_start:h_start+size_patch]
+        i[w_start:w_start+size_patch, h_start:h_start+size_patch] = img[w_start:w_start+size_patch, h_start:h_start+size_patch]
+        print("hey", i.shape)
         return i
     else:
         return i
