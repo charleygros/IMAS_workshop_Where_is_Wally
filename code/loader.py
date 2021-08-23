@@ -81,7 +81,6 @@ class WaldoLoader(Dataset):
 
 
 def extract_positive_patch(img, coords_bbox, size_patch):
-    print(np.unique(img))
     """Extracts patches around Bbox of a given patch size."""
     w_start, w_end, h_start, h_end = coords_bbox
     w_middle = w_start + (w_end - w_start) // 2
@@ -91,12 +90,9 @@ def extract_positive_patch(img, coords_bbox, size_patch):
         h_middle-half_size_patch:h_middle+half_size_patch]
     #i = img[wend - 224:wstart + 224, hend - 224:hstart + 224]
     if i.shape[0] != size_patch or i.shape[1] != size_patch:
-        print(i.shape, img.shape, w_middle, h_middle, w_start, w_end, h_start, h_end)
         i = img[w_end-size_patch:w_end, h_end-size_patch:h_end]
         if i.shape[0] != size_patch or i.shape[1] != size_patch:
             i = img[w_start:w_start + size_patch, h_start:h_start + size_patch]
-        print("hey", i.shape)
-        print(np.unique(img))
         return i
     else:
         return i

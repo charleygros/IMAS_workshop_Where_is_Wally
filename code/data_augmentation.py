@@ -78,13 +78,13 @@ class RandomTranslate(object):
 
         bbox_area_before = np.sum(bbox)
         canvas_bbox = np.zeros(bbox.shape).astype(np.uint8)
-        mask = bbox[max(-corner_y, 0):min(img.shape[0], -corner_y + img_shape[0]),
+        mask_bbox = bbox[max(-corner_y, 0):min(img.shape[0], -corner_y + img_shape[0]),
                max(-corner_x, 0):min(img.shape[1], -corner_x + img_shape[1])]
-        canvas_bbox[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3]] = mask
+        canvas_bbox[orig_box_cords[0]:orig_box_cords[2], orig_box_cords[1]:orig_box_cords[3]] = mask_bbox
         bbox = canvas_bbox
         bbox_area_after = np.sum(bbox)
 
         if bbox_area_after < 0.25 * bbox_area_before:
             bbox = np.zeros(bbox.shape)
-
+        print(np.unique(img))
         return img, bbox
