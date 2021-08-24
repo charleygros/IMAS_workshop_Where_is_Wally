@@ -59,7 +59,7 @@ def load_andy_model(path_model = "../dataset/pretrained_model.h5"):
 def display_predicitons_transparent(image, predictions):
     if np.max(image) <= 1:
         image *= 255
-    layer1 = Image.fromarray((image * 255).astype('uint8'))
+    layer1 = Image.fromarray((image).astype('uint8'))
     layer2 = Image.fromarray(
         np.concatenate(
             4*[np.expand_dims((225*(1-predictions)).astype('uint8'), axis=-1)],
@@ -75,7 +75,6 @@ def predict_with_pretrained_model(image, model, size_patch=224):
     # Normalise intensities
     mu = 0.57729064767952254
     std = 0.31263486676782137
-    print(np.max(image_test_resized))
     image_test_resized = (image_test_resized - mu) / std
 
     print("Extracting patches ...")
@@ -90,8 +89,7 @@ def predict_with_pretrained_model(image, model, size_patch=224):
 
     pred_full = reconstruct_image_from_patches(image_test_resized, np_pred_patch, 224)
 
-    image_test_resized_rescaled = image_test_resized * std + mu
-    print(np.max(image_test_resized_rescaled))
+    image_test_resized_rescaled = (image_test_resized * std + mu)
     pred_transparent = display_predicitons_transparent(image_test_resized_rescaled, pred_full)
 
     return image_test_resized_rescaled, pred_full, pred_transparent
