@@ -102,10 +102,13 @@ class OutConv(nn.Module):
         return self.conv(x)
 
 
-from keras.layers import Activation, Dropout, BatchNormalization, Conv2DTranspose, Input, Conv2D, \
-    concatenate, add, Reshape
-from keras.models import Model
+##############################################################################################################
+#                                              Andy's model
+##############################################################################################################
+
+from keras.layers import Activation, Dropout, BatchNormalization, Conv2DTranspose, Input, Conv2D, concatenate, add, Reshape
 from keras.regularizers import l2
+
 
 def relu(x): return Activation('relu')(x)
 
@@ -142,8 +145,6 @@ def dense_block(n, x, growth_rate, p, wd):
 
 
 def transition_dn(x, p, wd):
-    #     x = conv_relu_bn(x, x.get_shape().as_list()[-1], sz=1, p=p, wd=wd)
-    #     return MaxPooling2D(strides=(2, 2))(x)
     return conv_relu_bn(x, x.get_shape().as_list()[-1], sz=1, p=p, wd=wd, stride=2)
 
 
@@ -171,7 +172,8 @@ def up_path(added, skips, nb_layers, growth_rate, p, wd):
     return x
 
 
-def reverse(a): return list(reversed(a))
+def reverse(a):
+    return list(reversed(a))
 
 
 def create_tiramisu(nb_classes, img_input, nb_dense_block=6,
