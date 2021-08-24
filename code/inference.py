@@ -57,7 +57,7 @@ def load_andy_model(path_model = "../dataset/pretrained_model.h5"):
 
 
 def display_predicitons_transparent(image, predictions):
-    if max(image)<= 1:
+    if np.max(image) <= 1:
         image *= 255
     layer1 = Image.fromarray((image * 255).astype('uint8'))
     layer2 = Image.fromarray(
