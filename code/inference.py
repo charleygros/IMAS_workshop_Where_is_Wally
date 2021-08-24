@@ -92,4 +92,4 @@ def predict_with_pretrained_model(image, model, size_patch=224):
     image_test_resized_rescaled = (image_test_resized * std + mu)
     pred_transparent = display_predicitons_transparent(image_test_resized_rescaled, pred_full)
 
-    return image_test_resized_rescaled, pred_full, pred_transparent
+    return image_test_resized_rescaled.astype(int), pred_full, pred_transparent
