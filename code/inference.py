@@ -1,4 +1,5 @@
 import numpy as np
+from PIL import Image
 from loader import resize_image
 
 
@@ -53,6 +54,19 @@ def load_andy_model(path_model = "../dataset/pretrained_model.h5"):
     model.load_weights(path_model)
 
     return model
+
+
+def display_predicitons_transparent(image, predictions):
+    if max(image)<= 1:
+        image *= 255
+    layer1 = Image.fromarray((image * 255).astype('uint8'))
+    layer2 = Image.fromarray(
+        np.concatenate(
+            4*[np.expand_dims((225*(1-predictions)).astype('uint8'), axis=-1)],
+            axis=-1))
+    result = Image.new("RGBA", layer1.size)
+    result = Image.alpha_composite(result, layer1.convert('RGBA'))
+    return Image.alpha_composite(result, layer2)
 
 
 def predict_with_pretrained_model(image, model, size_patch=224):
